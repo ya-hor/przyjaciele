@@ -1,951 +1,578 @@
 <!DOCTYPE html>
-
 <html lang="pl">
-
 <head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Gra: Odmiana słowa "PRZYJACIEL" - Retro Edition</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-
-<!-- 
-
-========================================================================
-
-POCZĄTEK: style.css - Skopiuj poniższą zawartość do pliku style.css
-
-========================================================================
-
--->
-
-<style>
-
-:root {
-
---primary-bg: #2a2a2a;
-
---container-bg: #404040;
-
---container-border: #dcdcdc;
-
---text-color: #f5f5f5;
-
---header-color: #ffcc00;
-
---button-bg: #5a7d9a;
-
---button-hover-bg: #7e9bb6;
-
---button-secondary-bg: #ab47bc;
-
---button-secondary-hover-bg: #8e24aa;
-
---button-border: #f5f5f5;
-
---button-text: #f5f5f5;
-
---correct-color: #00e676;
-
---incorrect-color: #ff5252;
-
---life-color: #ff5252;
-
---input-bg: #2a2a2a;
-
---input-border: #888;
-
---font-family: 'Press Start 2P', monospace;
-
-}
-
-
-body {
-
-font-family: var(--font-family);
-
-background-color: var(--primary-bg);
-
-color: var(--text-color);
-
-display: flex;
-
-justify-content: center;
-
-align-items: center;
-
-min-height: 100vh;
-
-margin: 0;
-
-padding: 1rem;
-
-box-sizing: border-box;
-
-image-rendering: pixelated; /* For sharp pixels */
-
-}
-
-
-.game-container {
-
-position: relative;
-
-background-color: var(--container-bg);
-
-padding: 2rem;
-
-border: 4px solid var(--container-border);
-
-box-shadow: 
-
-inset 0 0 0 4px var(--container-bg), 
-
-inset 0 0 0 8px #000;
-
-width: 100%;
-
-max-width: 700px;
-
-text-align: center;
-
-}
-
-#mute-button {
-
-position: absolute;
-
-top: 15px;
-
-right: 15px;
-
-width: 28px;
-
-height: 28px;
-
-cursor: pointer;
-
-user-select: none;
-
-color: var(--text-color);
-
-}
-
-#mute-button svg {
-
-width: 100%;
-
-height: 100%;
-
-shape-rendering: crispEdges;
-
-}
-
-
-h1, h2 {
-
-margin-top: 0;
-
-color: var(--header-color);
-
-text-shadow: 2px 2px #000000;
-
-line-height: 1.4;
-
-}
-
-h1 {
-
-font-size: 1.5rem;
-
-}
-
-h2 {
-
-font-size: 1.4rem;
-
-}
-
-
-p {
-
-font-size: 0.9rem;
-
-line-height: 1.6;
-
-}
-
-
-.hidden {
-
-display: none;
-
-}
-
-
-.button {
-
-background-color: var(--button-bg);
-
-color: var(--button-text);
-
-border: 2px solid var(--button-border);
-
-padding: 0.8rem 1.6rem;
-
-font-family: var(--font-family);
-
-font-size: 1rem;
-
-cursor: pointer;
-
-transition: background-color 0.2s ease;
-
-margin-top: 1rem;
-
-text-shadow: 1px 1px #000;
-
-}
-
-
-.button:hover:not(:disabled) {
-
-background-color: var(--button-hover-bg);
-
-}
-
-.button:disabled {
-
-background-color: #555;
-
-cursor: not-allowed;
-
-opacity: 0.7;
-
-}
-
-#show-answer-button {
-
-background-color: var(--button-secondary-bg);
-
-font-size: 0.8rem;
-
-}
-
-#show-answer-button:hover:not(:disabled) {
-
-background-color: var(--button-secondary-hover-bg);
-
-}
-
-
-#game-header {
-
-display: flex;
-
-justify-content: space-between;
-
-align-items: center;
-
-margin-bottom: 1rem;
-
-}
-
-
-#question-counter {
-
-color: #ccc;
-
-font-size: 0.8rem;
-
-}
-
-#lives-display {
-
-display: flex;
-
-gap: 4px;
-
-}
-
-
-#lives-display svg {
-
-width: 24px;
-
-height: 24px;
-
-}
-
-#hint {
-
-color: var(--header-color);
-
-margin-bottom: 1.5rem;
-
-font-size: 0.8rem;
-
-line-height: 1.4;
-
-}
-
-#sentence {
-
-font-size: 1rem;
-
-margin-bottom: 1.5rem;
-
-min-height: 3em;
-
-}
-
-
-.input-area {
-
-display: flex;
-
-gap: 1rem;
-
-justify-content: center;
-
-align-items: center;
-
-flex-wrap: wrap;
-
-}
-
-#user-answer {
-
-padding: 0.7rem;
-
-font-size: 1rem;
-
-font-family: var(--font-family);
-
-color: var(--text-color);
-
-background-color: var(--input-bg);
-
-border: 2px solid var(--input-border);
-
-width: 300px;
-
-max-width: 100%;
-
-text-align: center;
-
-}
-
-#user-answer:focus {
-
-outline: none;
-
-border-color: var(--header-color);
-
-}
-
-#feedback {
-
-font-size: 1rem;
-
-margin-top: 1.5rem;
-
-min-height: 4rem;
-
-line-height: 1.5;
-
-}
-
-.correct {
-
-color: var(--correct-color);
-
-}
-
-.incorrect {
-
-color: var(--incorrect-color);
-
-}
-
-.declension-table {
-
-margin: 2rem auto;
-
-border-collapse: collapse;
-
-font-size: 0.7rem;
-
-text-align: left;
-
-}
-
-
-.declension-table th, .declension-table td {
-
-border: 2px solid var(--input-border);
-
-padding: 8px;
-
-}
-
-
-.declension-table th {
-
-background-color: var(--input-bg);
-
-color: var(--header-color);
-
-}
-
-
-@media (max-width: 600px) {
-
-.game-container {
-
-padding: 1.5rem 1rem;
-
-border-width: 2px;
-
-box-shadow: inset 0 0 0 2px var(--container-bg), inset 0 0 0 4px #000;
-
-}
-
-#mute-button {
-
-width: 24px;
-
-height: 24px;
-
-}
-
-h1 { font-size: 1.2rem; }
-
-h2 { font-size: 1.1rem; }
-
-p, #user-answer, .button, #hint, #sentence { font-size: 0.8rem; }
-
-.input-area { flex-direction: column; }
-
-.declension-table { font-size: 0.6rem; }
-
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra: Odmiana słowa "PRZYJACIEL" - Retro Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+    
+    <!-- 
+      ========================================================================
+      POCZĄTEK: style.css - Skopiuj poniższą zawartość do pliku style.css
+      ========================================================================
+    -->
+    <style>
+        :root {
+            --primary-bg: #2a2a2a;
+            --container-bg: #404040;
+            --container-border: #dcdcdc;
+            --text-color: #f5f5f5;
+            --header-color: #ffcc00;
+            --button-bg: #5a7d9a;
+            --button-hover-bg: #7e9bb6;
+            --button-secondary-bg: #ab47bc;
+            --button-secondary-hover-bg: #8e24aa;
+            --button-border: #f5f5f5;
+            --button-text: #f5f5f5;
+            --correct-color: #00e676;
+            --incorrect-color: #ff5252;
+            --life-color: #ff5252;
+            --input-bg: #2a2a2a;
+            --input-border: #888;
+            --font-family: 'Press Start 2P', monospace;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+            box-sizing: border-box;
+            image-rendering: pixelated; /* For sharp pixels */
+        }
+
+        .game-container {
+            position: relative;
+            background-color: var(--container-bg);
+            padding: 2rem;
+            border: 4px solid var(--container-border);
+            box-shadow: 
+                inset 0 0 0 4px var(--container-bg), 
+                inset 0 0 0 8px #000;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+        
+        #mute-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-color);
+        }
+        
+        #mute-button svg {
+            width: 100%;
+            height: 100%;
+            shape-rendering: crispEdges;
+        }
+
+        h1, h2 {
+            margin-top: 0;
+            color: var(--header-color);
+            text-shadow: 2px 2px #000000;
+            line-height: 1.4;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+        }
+
+        p {
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: 2px solid var(--button-border);
+            padding: 0.8rem 1.6rem;
+            font-family: var(--font-family);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 1rem;
+            text-shadow: 1px 1px #000;
+        }
+
+        .button:hover:not(:disabled) {
+            background-color: var(--button-hover-bg);
+        }
+        
+        .button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        #show-answer-button {
+            background-color: var(--button-secondary-bg);
+            font-size: 0.8rem;
+        }
+        
+        #show-answer-button:hover:not(:disabled) {
+             background-color: var(--button-secondary-hover-bg);
+        }
+
+        #game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        #question-counter {
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+        
+        #lives-display {
+            display: flex;
+            gap: 4px;
+        }
+
+        #lives-display svg {
+             width: 24px;
+             height: 24px;
+             color: var(--life-color);
+             stroke: var(--life-color);
+        }
+        
+        #hint {
+            color: var(--header-color);
+            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        #sentence {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            min-height: 3em;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        #user-answer {
+            padding: 0.7rem;
+            font-size: 1rem;
+            font-family: var(--font-family);
+            color: var(--text-color);
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            width: 300px;
+            max-width: 100%;
+            text-align: center;
+        }
+        
+        #user-answer:focus {
+            outline: none;
+            border-color: var(--header-color);
+        }
+        
+        #feedback {
+            font-size: 1rem;
+            margin-top: 1.5rem;
+            min-height: 4rem;
+            line-height: 1.5;
+        }
+        
+        .correct {
+            color: var(--correct-color);
+        }
+        
+        .incorrect {
+            color: var(--incorrect-color);
+        }
+        
+        .declension-table-wrapper {
+             margin: 2rem auto;
+        }
+
+        .desktop-table {
+            border-collapse: collapse;
+            font-size: 0.7rem;
+            text-align: left;
+            width: 100%;
+        }
+
+        .desktop-table th, .desktop-table td {
+            border: 2px solid var(--input-border);
+            padding: 8px;
+        }
+
+        .desktop-table th {
+            background-color: var(--input-bg);
+            color: var(--header-color);
+        }
+
+        .mobile-list {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 1.5rem 1rem;
+                border-width: 2px;
+                box-shadow: inset 0 0 0 2px var(--container-bg), inset 0 0 0 4px #000;
+            }
+            #mute-button {
+                width: 24px;
+                height: 24px;
+            }
+            h1 { font-size: 1.2rem; }
+            h2 { font-size: 1.1rem; }
+            p, #user-answer, .button, #hint, #sentence { font-size: 0.8rem; }
+            .input-area { flex-direction: column; }
+            
+            .desktop-table {
+                display: none;
+            }
+            .mobile-list {
+                display: block;
+                text-align: left;
+                font-size: 0.8rem;
+            }
+            .mobile-list-item {
+                border: 2px solid var(--input-border);
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            .mobile-list-item h3 {
+                margin: 0 0 0.5rem 0;
+                font-size: 0.9rem;
+                color: var(--header-color);
+            }
+            .mobile-list-item p {
+                margin: 0.3rem 0;
+            }
+        }
+    </style>
+    <!-- 
+      ========================================================================
+      KONIEC: style.css
+      ========================================================================
+    -->
 </head>
-
 <body>
 
-
-<div class="game-container">
-
-<div id="mute-button" title="Wycisz / Włącz dźwięk"></div>
-
-
-<div id="start-screen">
-
-<h1>Gra: Odmiana slowa 'PRZYJACIEL'</h1>
-
-<p>Uzupełnij luki w zdaniach poprawną formą słowa 'przyjaciel'. Powodzenia!</p>
-
-<table class="declension-table">
-
-<thead>
-
-<tr>
-
-<th>Przypadek</th>
-
-<th>Liczba pojedyncza</th>
-
-<th>Liczba mnoga</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr><td>Mianownik (kto? co?)</td><td>przyjaciel</td><td>przyjaciele</td></tr>
-
-<tr><td>Dopełniacz (kogo? czego?)</td><td>przyjaciela</td><td>przyjaciół</td></tr>
-
-<tr><td>Celownik (komu? czemu?)</td><td>przyjacielowi</td><td>przyjaciołom</td></tr>
-
-<tr><td>Biernik (kogo? co?)</td><td>przyjaciela</td><td>przyjaciół</td></tr>
-
-<tr><td>Narzędnik (z kim? z czym?)</td><td>przyjacielem</td><td>przyjaciółmi</td></tr>
-
-<tr><td>Miejscownik (o kim? o czym?)</td><td>przyjacielu</td><td>przyjaciołach</td></tr>
-
-<tr><td>Wołacz (o!)</td><td>przyjacielu</td><td>przyjaciele</td></tr>
-
-</tbody>
-
-</table>
-
-<button id="start-button" class="button">START</button>
-
-</div>
-
-
-<div id="game-screen" class="hidden">
-
-<div id="game-header">
-
-<p id="question-counter">Pytanie 1 / 14</p>
-
-<div id="lives-display"></div>
-
-</div>
-
-<p id="hint">Dopełniacz (kogo? czego?)</p>
-
-<p id="sentence">Dawno nie widzialem mojego [_______].</p>
-
-<div id="input-area" class="input-area">
-
-<input type="text" id="user-answer" placeholder="Wpisz odpowiedz...">
-
-<button id="check-button" class="button">Sprawdź</button>
-
-</div>
-
-<button id="show-answer-button" class="button">Pokaż odpowiedź (-1 życie)</button>
-
-<p id="feedback"></p>
-
-</div>
-
-
-<div id="end-screen" class="hidden">
-
-<h2 id="end-title">Koniec gry!</h2>
-
-<p id="score">Twoj wynik: 11 / 14 poprawnych odpowiedzi.</p>
-
-<button id="play-again-button" class="button">Zagraj jeszcze raz</button>
-
-</div>
-
-</div>
-
-
-<script>
-
-document.addEventListener('DOMContentLoaded', () => {
-
-// --- Źródło pytań ---
-
-const pytania = [
-
-{ przypadek: "Mianownik (kto? co?)", forma: "przyjaciel", zdanie: "Mój najlepszy [_______] mieszka w innym mieście." },
-
-{ przypadek: "Dopełniacz (kogo? czego?)", forma: "przyjaciela", zdanie: "Nie mam czasu dla swojego [_______]." },
-
-{ przypadek: "Celownik (komu? czemu?)", forma: "przyjacielowi", zdanie: "Muszę pomóc mojemu [_______] w przeprowadzce." },
-
-{ przypadek: "Biernik (kogo? co?)", forma: "przyjaciela", zdanie: "Wczoraj spotkałem starego [_______]." },
-
-{ przypadek: "Narzędnik (z kim? z czym?)", forma: "przyjacielem", zdanie: "Zawsze chciałem być dobrym [_______]." },
-
-{ przypadek: "Miejscownik (o kim? o czym?)", forma: "przyjacielu", zdanie: "Często myślę o moim [_______]." },
-
-{ przypadek: "Wołacz (o!)", forma: "przyjacielu", zdanie: "O, mój drogi [_______], jak się cieszę, że Cię widzę!" },
-
-{ przypadek: "Mianownik (kto? co?)", forma: "przyjaciele", zdanie: "Moi [_______] zawsze mnie wspierają." },
-
-{ przypadek: "Dopełniacz (kogo? czego?)", forma: "przyjaciół", zdanie: "Dom jest zawsze pełen moich [_______]." },
-
-{ przypadek: "Celownik (komu? czemu?)", forma: "przyjaciołom", zdanie: "Ufam bezgranicznie moim [_______]." },
-
-{ przypadek: "Biernik (kogo? co?)", forma: "przyjaciół", zdanie: "Zaprosiłem na imprezę wszystkich moich [_______]." },
-
-{ przypadek: "Narzędnik (z kim? z czym?)", forma: "przyjaciółmi", zdanie: "Lubię spędzać czas z moimi [_______]." },
-
-{ przypadek: "Miejscownik (o kim? o czym?)", forma: "przyjaciołach", zdanie: "Na moich [_______] zawsze mogę polegać." },
-
-{ przypadek: "Wołacz (o!)", forma: "przyjaciele", zdanie: "Drodzy [_______], dziękuję, że jesteście!" }
-
-];
-
-
-// --- Referencje do elementów DOM ---
-
-const startScreen = document.getElementById('start-screen');
-
-const gameScreen = document.getElementById('game-screen');
-
-const endScreen = document.getElementById('end-screen');
-
-const startButton = document.getElementById('start-button');
-
-const checkButton = document.getElementById('check-button');
-
-const showAnswerButton = document.getElementById('show-answer-button');
-
-const playAgainButton = document.getElementById('play-again-button');
-
-const muteButton = document.getElementById('mute-button');
-
-const questionCounter = document.getElementById('question-counter');
-
-const livesDisplay = document.getElementById('lives-display');
-
-const hint = document.getElementById('hint');
-
-const sentence = document.getElementById('sentence');
-
-const userAnswer = document.getElementById('user-answer');
-
-const inputArea = document.getElementById('input-area');
-
-const feedback = document.getElementById('feedback');
-
-const endTitle = document.getElementById('end-title');
-
-const scoreDisplay = document.getElementById('score');
-
-// --- Ikony SVG ---
-
-const speakerOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>`;
-
-const speakerOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path></svg>`;
-
-const appleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8,2h1v1h-1z" fill="#6A3E2B"/><path d="M9,1h1v1h-1z" fill="#65C466"/><path d="M4,4h1v-1h6v1h1v1h1v2h-1v1h-1v1h-1v1H5v-1H4v-1H3v-1H2V5h1V4h1z" fill="#D92E38"/></svg>`;
-
-
-// --- Ustawienia audio (Tone.js) ---
-
-const sfx = {
-
-correct: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(),
-
-incorrect: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.0, release: 0.2 } }).toDestination(),
-
-click: new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 2, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } }).toDestination()
-
-};
-
-// --- Zmienne stanu gry ---
-
-let shuffledQuestions = [];
-
-let currentQuestionIndex = 0;
-
-let score = 0;
-
-let lives = 0;
-
-const totalQuestions = pytania.length;
-
-const delayAfterAnswer = 2500;
-
-let audioStarted = false;
-
-
-// --- Funkcje ---
-
-function updateMuteIcon() {
-
-muteButton.innerHTML = Tone.Destination.mute ? speakerOffIcon : speakerOnIcon;
-
-}
-
-function shuffleArray(array) {
-
-const shuffled = [...array];
-
-for (let i = shuffled.length - 1; i > 0; i--) {
-
-const j = Math.floor(Math.random() * (i + 1));
-
-[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-
-}
-
-return shuffled;
-
-}
-
-
-async function initAudio() {
-
-if (audioStarted) return;
-
-await Tone.start();
-
-audioStarted = true;
-
-}
-
-function updateLivesDisplay() {
-
-livesDisplay.innerHTML = ""; // Clear previous items
-
-for(let i=0; i<lives; i++){
-
-const lifeIcon = document.createElement('div');
-
-lifeIcon.innerHTML = appleIcon;
-
-livesDisplay.appendChild(lifeIcon.firstChild);
-
-}
-
-checkButton.disabled = lives <= 0;
-
-showAnswerButton.disabled = lives <= 0;
-
-}
-
-
-function playClickSound() {
-
-if (audioStarted) sfx.click.triggerAttackRelease("C2", "8n");
-
-}
-
-
-function startGame() {
-
-initAudio();
-
-playClickSound();
-
-score = 0;
-
-lives = 3;
-
-currentQuestionIndex = 0;
-
-shuffledQuestions = shuffleArray(pytania);
-
-startScreen.classList.add('hidden');
-
-endScreen.classList.add('hidden');
-
-gameScreen.classList.remove('hidden');
-
-updateLivesDisplay();
-
-showNextQuestion();
-
-}
-
-
-function showNextQuestion() {
-
-if (lives <= 0) {
-
-endGame(true);
-
-return;
-
-}
-
-if (currentQuestionIndex < totalQuestions) {
-
-resetQuestionState();
-
-const question = shuffledQuestions[currentQuestionIndex];
-
-questionCounter.textContent = `Pytanie ${currentQuestionIndex + 1} / ${totalQuestions}`;
-
-hint.textContent = question.przypadek;
-
-sentence.innerHTML = question.zdanie.replace('[_______]', `<span>[_______]</span>`);
-
-} else {
-
-endGame(false);
-
-}
-
-}
-
-function resetQuestionState() {
-
-feedback.textContent = '';
-
-feedback.className = '';
-
-userAnswer.value = '';
-
-userAnswer.disabled = false;
-
-checkButton.disabled = false;
-
-showAnswerButton.disabled = false;
-
-inputArea.classList.remove('hidden');
-
-showAnswerButton.classList.remove('hidden');
-
-userAnswer.focus();
-
-}
-
-
-function processAnswer(isCorrect, wasRevealed = false) {
-
-userAnswer.disabled = true;
-
-checkButton.disabled = true;
-
-showAnswerButton.disabled = true;
-
-const correctForm = shuffledQuestions[currentQuestionIndex].forma;
-
-
-if (isCorrect) {
-
-score++;
-
-feedback.textContent = 'Świetnie!';
-
-feedback.className = 'correct';
-
-if (audioStarted) sfx.correct.triggerAttackRelease("C5", "0.5s");
-
-} else {
-
-lives--;
-
-updateLivesDisplay();
-
-if (wasRevealed) {
-
-feedback.innerHTML = '';
-
-feedback.className = '';
-
-if (audioStarted) sfx.incorrect.triggerAttackRelease("E3", "0.5s"); // Different sound for hint
-
-} else {
-
-feedback.innerHTML = `Błąd!<br>Poprawna forma: ${correctForm}`;
-
-feedback.className = 'incorrect';
-
-if (audioStarted) sfx.incorrect.triggerAttackRelease("G#2", "0.5s");
-
-}
-
-}
-
-currentQuestionIndex++;
-
-setTimeout(showNextQuestion, delayAfterAnswer);
-
-}
-
-
-function checkAnswer() {
-
-playClickSound();
-
-const answer = userAnswer.value.trim().toLowerCase();
-
-const correctAnswer = shuffledQuestions[currentQuestionIndex].forma.toLowerCase();
-
-processAnswer(answer === correctAnswer, false);
-
-}
-
-function showCorrectAnswer() {
-
-playClickSound();
-
-if (lives > 0) {
-
-const correctForm = shuffledQuestions[currentQuestionIndex].forma;
-
-userAnswer.value = correctForm;
-
-processAnswer(false, true); 
-
-}
-
-}
-
-
-function endGame(outOfLives) {
-
-gameScreen.classList.add('hidden');
-
-endScreen.classList.remove('hidden');
-
-if (outOfLives) {
-
-endTitle.textContent = "Game Over";
-
-scoreDisplay.textContent = `Twój końcowy wynik: ${score} / ${totalQuestions}`;
-
-} else {
-
-endTitle.textContent = "Koniec Gry!";
-
-scoreDisplay.textContent = `Twój wynik: ${score} / ${totalQuestions}`;
-
-}
-
-}
-
-function toggleMute() {
-
-playClickSound();
-
-Tone.Destination.mute = !Tone.Destination.mute;
-
-updateMuteIcon();
-
-}
-
-
-// --- Inicjalizacja ---
-
-updateMuteIcon();
-
-
-// --- Event Listeners ---
-
-startButton.addEventListener('click', startGame);
-
-checkButton.addEventListener('click', checkAnswer);
-
-showAnswerButton.addEventListener('click', showCorrectAnswer);
-
-userAnswer.addEventListener('keypress', (event) => {
-
-if (event.key === 'Enter' && !checkButton.disabled) { checkAnswer(); }
-
-});
-
-playAgainButton.addEventListener('click', () => {
-
-playClickSound();
-
-startGame();
-
-});
-
-muteButton.addEventListener('click', toggleMute);
-
-});
-
-</script>
-
-</body>
-
+    <div class="game-container">
+        <!-- Przycisk wyciszenia -->
+        <div id="mute-button" title="Wycisz / Włącz dźwięk"></div>
+
+        <!-- Ekran Startowy -->
+        <div id="start-screen">
+            <h1>Gra: Odmiana slowa 'PRZYJACIEL'</h1>
+            <p>Uzupełnij luki w zdaniach poprawną formą słowa 'przyjaciel'. Powodzenia!</p>
+            
+            <div class="declension-table-wrapper">
+                <!-- Tabela dla desktopów -->
+                <table class="desktop-table">
+                    <thead>
+                        <tr>
+                            <th>Przypadek</th>
+                            <th>Liczba pojedyncza</th>
+                            <th>Liczba mnoga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Mianownik (kto? co?)</td><td>przyjaciel</td><td>przyjaciele</td></tr>
+                        <tr><td>Dopełniacz (kogo? czego?)</td><td>przyjaciela</td><td>przyjaciół</td></tr>
+                        <tr><td>Celownik (komu? czemu?)</td><td>przyjacielowi</td><td>przyjaciołom</td></tr>
+                        <tr><td>Biernik (kogo? co?)</td><td>przyjaciela</td><td>przyjaciół</td></tr>
+                        <tr><td>Narzędnik (z kim? z czym?)</td><td>przyjacielem</td><td>przyjaciółmi</td></tr>
+                        <tr><td>Miejscownik (o kim? o czym?)</td><td>przyjacielu</td><td>przyjaciołach</td></tr>
+                        <tr><td>Wołacz (o!)</td><td>przyjacielu</td><td>przyjaciele</td></tr>
+                    </tbody>
+                </table>
+                <!-- Lista dla urządzeń mobilnych -->
+                <div class="mobile-list">
+                    <div class="mobile-list-item"><h3>Mianownik (kto? co?)</h3><p>L.poj: przyjaciel</p><p>L.mn: przyjaciele</p></div>
+                    <div class="mobile-list-item"><h3>Dopełniacz (kogo? czego?)</h3><p>L.poj: przyjaciela</p><p>L.mn: przyjaciół</p></div>
+                    <div class="mobile-list-item"><h3>Celownik (komu? czemu?)</h3><p>L.poj: przyjacielowi</p><p>L.mn: przyjaciołom</p></div>
+                    <div class="mobile-list-item"><h3>Biernik (kogo? co?)</h3><p>L.poj: przyjaciela</p><p>L.mn: przyjaciół</p></div>
+                    <div class="mobile-list-item"><h3>Narzędnik (z kim? z czym?)</h3><p>L.poj: przyjacielem</p><p>L.mn: przyjaciółmi</p></div>
+                    <div class="mobile-list-item"><h3>Miejscownik (o kim? o czym?)</h3><p>L.poj: przyjacielu</p><p>L.mn: przyjaciołach</p></div>
+                    <div class="mobile-list-item"><h3>Wołacz (o!)</h3><p>L.poj: przyjacielu</p><p>L.mn: przyjaciele</p></div>
+                </div>
+            </div>
+            
+            <button id="start-button" class="button">START</button>
+        </div>
+
+        <!-- Ekran Gry -->
+        <div id="game-screen" class="hidden">
+            <div id="game-header">
+                <p id="question-counter">Pytanie 1 / 14</p>
+                <div id="lives-display"></div>
+            </div>
+            <p id="hint">Dopełniacz (kogo? czego?)</p>
+            <p id="sentence">Dawno nie widzialem mojego [_______].</p>
+            
+            <div id="input-area" class="input-area">
+                <input type="text" id="user-answer" placeholder="Wpisz odpowiedz...">
+                <button id="check-button" class="button">Sprawdź</button>
+            </div>
+             <button id="show-answer-button" class="button">Pokaż odpowiedź (-1 życie)</button>
+            
+            <p id="feedback"></p>
+        </div>
+
+        <!-- Ekran Końcowy -->
+        <div id="end-screen" class="hidden">
+            <h2 id="end-title">Koniec gry!</h2>
+            <p id="score">Twoj wynik: 11 / 14 poprawnych odpowiedzi.</p>
+            <button id="play-again-button" class="button">Zagraj jeszcze raz</button>
+        </div>
+    </div>
+
+    <!-- 
+      ========================================================================
+      POCZĄTEK: script.js - Skopiuj poniższą zawartość do pliku script.js
+      ========================================================================
+    -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Źródło pytań ---
+            const pytania = [
+                { przypadek: "Mianownik (kto? co?)", forma: "przyjaciel", zdanie: "Mój najlepszy [_______] mieszka w innym mieście." },
+                { przypadek: "Dopełniacz (kogo? czego?)", forma: "przyjaciela", zdanie: "Nie mam czasu dla swojego [_______]." },
+                { przypadek: "Celownik (komu? czemu?)", forma: "przyjacielowi", zdanie: "Muszę pomóc mojemu [_______] w przeprowadzce." },
+                { przypadek: "Biernik (kogo? co?)", forma: "przyjaciela", zdanie: "Wczoraj spotkałem starego [_______]." },
+                { przypadek: "Narzędnik (z kim? z czym?)", forma: "przyjacielem", zdanie: "Zawsze chciałem być dobrym [_______]." },
+                { przypadek: "Miejscownik (o kim? o czym?)", forma: "przyjacielu", zdanie: "Często myślę o moim [_______]." },
+                { przypadek: "Wołacz (o!)", forma: "przyjacielu", zdanie: "O, mój drogi [_______], jak się cieszę, że Cię widzę!" },
+                { przypadek: "Mianownik (kto? co?)", forma: "przyjaciele", zdanie: "Moi [_______] zawsze mnie wspierają." },
+                { przypadek: "Dopełniacz (kogo? czego?)", forma: "przyjaciół", zdanie: "Dom jest zawsze pełen moich [_______]." },
+                { przypadek: "Celownik (komu? czemu?)", forma: "przyjaciołom", zdanie: "Ufam bezgranicznie moim [_______]." },
+                { przypadek: "Biernik (kogo? co?)", forma: "przyjaciół", zdanie: "Zaprosiłem na imprezę wszystkich moich [_______]." },
+                { przypadek: "Narzędnik (z kim? z czym?)", forma: "przyjaciółmi", zdanie: "Lubię spędzać czas z moimi [_______]." },
+                { przypadek: "Miejscownik (o kim? o czym?)", forma: "przyjaciołach", zdanie: "Na moich [_______] zawsze mogę polegać." },
+                { przypadek: "Wołacz (o!)", forma: "przyjaciele", zdanie: "Drodzy [_______], dziękuję, że jesteście!" }
+            ];
+
+            // --- Referencje do elementów DOM ---
+            const startScreen = document.getElementById('start-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const endScreen = document.getElementById('end-screen');
+            const startButton = document.getElementById('start-button');
+            const checkButton = document.getElementById('check-button');
+            const showAnswerButton = document.getElementById('show-answer-button');
+            const playAgainButton = document.getElementById('play-again-button');
+            const muteButton = document.getElementById('mute-button');
+            const questionCounter = document.getElementById('question-counter');
+            const livesDisplay = document.getElementById('lives-display');
+            const hint = document.getElementById('hint');
+            const sentence = document.getElementById('sentence');
+            const userAnswer = document.getElementById('user-answer');
+            const inputArea = document.getElementById('input-area');
+            const feedback = document.getElementById('feedback');
+            const endTitle = document.getElementById('end-title');
+            const scoreDisplay = document.getElementById('score');
+            
+            // --- Ikony SVG ---
+            const speakerOnIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg>`;
+            const speakerOffIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"></path></svg>`;
+            const appleIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><path d="M8,2h1v1h-1z" fill="#6A3E2B"/><path d="M9,1h1v1h-1z" fill="#65C466"/><path d="M4,4h1v-1h6v1h1v1h1v2h-1v1h-1v1h-1v1H5v-1H4v-1H3v-1H2V5h1V4h1z" fill="#D92E38"/></svg>`;
+
+            // --- Ustawienia audio (Tone.js) ---
+            const sfx = {
+                correct: new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination(),
+                incorrect: new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.01, decay: 0.4, sustain: 0.0, release: 0.2 } }).toDestination(),
+                click: new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 2, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } }).toDestination()
+            };
+            
+            // --- Zmienne stanu gry ---
+            let shuffledQuestions = [];
+            let currentQuestionIndex = 0;
+            let score = 0;
+            let lives = 0;
+            const totalQuestions = pytania.length;
+            const delayAfterAnswer = 2500;
+            let audioStarted = false;
+
+            // --- Funkcje ---
+            function updateMuteIcon() {
+                 muteButton.innerHTML = Tone.Destination.mute ? speakerOffIcon : speakerOnIcon;
+            }
+            
+            function shuffleArray(array) {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            }
+
+            async function initAudio() {
+                if (audioStarted) return;
+                await Tone.start();
+                audioStarted = true;
+            }
+            
+            function updateLivesDisplay() {
+                livesDisplay.innerHTML = ""; // Clear previous items
+                for(let i=0; i<lives; i++){
+                    const lifeIcon = document.createElement('div');
+                    lifeIcon.innerHTML = appleIcon;
+                    livesDisplay.appendChild(lifeIcon.firstChild);
+                }
+                checkButton.disabled = lives <= 0;
+                showAnswerButton.disabled = lives <= 0;
+            }
+
+            function playClickSound() {
+                if (audioStarted) sfx.click.triggerAttackRelease("C2", "8n");
+            }
+
+            function startGame() {
+                initAudio();
+                playClickSound();
+                score = 0;
+                lives = 3;
+                currentQuestionIndex = 0;
+                shuffledQuestions = shuffleArray(pytania);
+                startScreen.classList.add('hidden');
+                endScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                updateLivesDisplay();
+                showNextQuestion();
+            }
+
+            function showNextQuestion() {
+                 if (lives <= 0) {
+                    endGame(true);
+                    return;
+                }
+                if (currentQuestionIndex < totalQuestions) {
+                    resetQuestionState();
+                    const question = shuffledQuestions[currentQuestionIndex];
+                    questionCounter.textContent = `Pytanie ${currentQuestionIndex + 1} / ${totalQuestions}`;
+                    hint.textContent = question.przypadek;
+                    sentence.innerHTML = question.zdanie.replace('[_______]', `<span>[_______]</span>`);
+                } else {
+                    endGame(false);
+                }
+            }
+            
+            function resetQuestionState() {
+                feedback.textContent = '';
+                feedback.className = '';
+                userAnswer.value = '';
+                userAnswer.disabled = false;
+                checkButton.disabled = false;
+                showAnswerButton.disabled = false;
+                inputArea.classList.remove('hidden');
+                showAnswerButton.classList.remove('hidden');
+                userAnswer.focus();
+            }
+
+            function processAnswer(isCorrect, wasRevealed = false) {
+                userAnswer.disabled = true;
+                checkButton.disabled = true;
+                showAnswerButton.disabled = true;
+                const correctForm = shuffledQuestions[currentQuestionIndex].forma;
+
+                if (isCorrect) {
+                    score++;
+                    feedback.textContent = 'Świetnie!';
+                    feedback.className = 'correct';
+                    if (audioStarted) sfx.correct.triggerAttackRelease("C5", "0.5s");
+                } else {
+                    lives--;
+                    updateLivesDisplay();
+                     if (wasRevealed) {
+                         feedback.innerHTML = '';
+                         feedback.className = '';
+                         if (audioStarted) sfx.incorrect.triggerAttackRelease("E3", "0.5s"); // Different sound for hint
+                    } else {
+                        feedback.innerHTML = `Błąd!<br>Poprawna forma: ${correctForm}`;
+                        feedback.className = 'incorrect';
+                        if (audioStarted) sfx.incorrect.triggerAttackRelease("G#2", "0.5s");
+                    }
+                }
+                currentQuestionIndex++;
+                setTimeout(showNextQuestion, delayAfterAnswer);
+            }
+
+            function checkAnswer() {
+                playClickSound();
+                const answer = userAnswer.value.trim().toLowerCase();
+                const correctAnswer = shuffledQuestions[currentQuestionIndex].forma.toLowerCase();
+                processAnswer(answer === correctAnswer, false);
+            }
+            
+            function showCorrectAnswer() {
+                playClickSound();
+                if (lives > 0) {
+                   const correctForm = shuffledQuestions[currentQuestionIndex].forma;
+                   userAnswer.value = correctForm;
+                   processAnswer(false, true); 
+                }
+            }
+
+            function endGame(outOfLives) {
+                gameScreen.classList.add('hidden');
+                endScreen.classList.remove('hidden');
+                if (outOfLives) {
+                    endTitle.textContent = "Game Over";
+                    scoreDisplay.textContent = `Twój końcowy wynik: ${score} / ${totalQuestions}`;
+                } else {
+                    endTitle.textContent = "Koniec Gry!";
+                    scoreDisplay.textContent = `Twój wynik: ${score} / ${totalQuestions}`;
+                }
+            }
+            
+            function toggleMute() {
+                playClickSound();
+                Tone.Destination.mute = !Tone.Destination.mute;
+                updateMuteIcon();
+            }
+
+            // --- Inicjalizacja ---
+            updateMuteIcon();
+
+            // --- Event Listeners ---
+            startButton.addEventListener('click', startGame);
+            checkButton.addEventListener('click', checkAnswer);
+            showAnswerButton.addEventListener('click', showCorrectAnswer);
+            userAnswer.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' && !checkButton.disabled) { checkAnswer(); }
+            });
+            playAgainButton.addEventListener('click', () => {
+                playClickSound();
+                startGame();
+            });
+            muteButton.addEventListener('click', toggleMute);
+        });
+    </script>
+    </body>
 </html>
